@@ -40,10 +40,8 @@ class ReflexAgent(Agent):
         """
         # Collect legal moves and successor states
         legalMoves = gameState.getLegalActions()
-
-        # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
-        bestScore = max(scores)
+        bestScore = max(scores);
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
@@ -68,13 +66,37 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
+        score = 0
         newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
+        food = successorGameState.getFood()
+        foodNum = successorGameState.getNumFood()
+        #want to reduce the distance to the closest food
+        score = score - 10*self.nearestFoodDistance(food,newPos)
+        #want to reduce the number of food(to prevent pacman from staying close to food but not eat it)
+        score = score - 1000*foodNum;
         newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        for ghostState in newGhostStates:
+            ghostPosition = ghostState.getPosition()
+            distance = manhattanDistance(newPos,ghostPosition)
+            #do not want to stay close to ghosts; if close, run away
+            if distance < 3:
+                score = score - 5000;
+                score = score+distance*50
+        return score
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+    def nearestFoodDistance(self,food,position):
+        height, width = food.height, food.width
+        minDistance = height+width
+        minPosition = None
+        for y in range(0,height):
+            for x in range(0,width):
+                if food[x][y] == True:
+                    distance = manhattanDistance((x,y),position)
+                    if distance < minDistance:
+                        minPosition = (x,y)
+                        minDistance = distance
+        return minDistance
+
 
 def scoreEvaluationFunction(currentGameState):
     """
