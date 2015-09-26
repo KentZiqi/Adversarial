@@ -235,8 +235,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 if value > max_value:
                     max_value, max_action = value, action
                 if max_value > beta[0]:
-                    print "max value is " + str(max_value)
-                    print "beta for " + str(max_action) + " " + str(beta[0])
                     return (max_value, max_action)
                 new_alpha[0] = max(new_alpha[0], max_value)
             return (max_value, max_action)
@@ -253,7 +251,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 if value < min_value:
                     min_value, min_action = value, action
                 if min_value < alpha[0]:
-                    #print "alpha for " + str(min_action) + " " + str(alpha[0])
                     return (min_value, min_action)
                 new_beta[0] = min(new_beta[0], min_value)
             return (min_value, min_action)
