@@ -86,13 +86,11 @@ class ReflexAgent(Agent):
     def nearestFoodDistance(self,food,position):
         height, width = food.height, food.width
         minDistance = height+width
-        minPosition = None
         for y in range(0,height):
             for x in range(0,width):
                 if food[x][y] == True:
                     distance = manhattanDistance((x,y),position)
                     if distance < minDistance:
-                        minPosition = (x,y)
                         minDistance = distance
         return minDistance
 
@@ -336,8 +334,35 @@ def betterEvaluationFunction(currentGameState):
       evaluation function (question 5).
       DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    score = 0;
+    newPos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    foodNum = currentGameState.getNumFood()
+    #want to reduce the distance to the closest food
+    score = score - 10*nearestFoodDistance(food,newPos)
+    #want to reduce the number of food(to prevent pacman from staying close to food but not eat it)
+    score = score - 1000*foodNum;
+    newGhostStates = currentGameState.getGhostStates()
+    for ghostState in newGhostStates:
+        ghostPosition = ghostState.getPosition()
+        distance = manhattanDistance(newPos,ghostPosition)
+        #do not want to stay close to ghosts; if close, run away
+        if distance < 3:
+            score = score - 5000;
+            score = score+distance*50
+            return score
+    return currentGameState.getScore()
+
+def nearestFoodDistance(food,position):
+    height, width = food.height, food.width
+    minDistance = height+width
+    for y in range(0,height):
+        for x in range(0,width):
+            if food[x][y] == True:
+                distance = manhattanDistance((x,y),position)
+                if distance < minDistance:
+                    minDistance = distance
+    return minDistance
 
 # Abbreviation
 better = betterEvaluationFunction
