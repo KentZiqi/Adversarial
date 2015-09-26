@@ -11,7 +11,6 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -156,8 +155,49 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.isLose():
             Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        (max_value, max_action) = self.evaluate(gameState,0,1);
+        return max_action
+
+    def evaluate(self,gameState,agentIndex,depth):
+        #if the game ends
+        if gameState.isLose() or gameState.isWin():
+            return (self.evaluationFunction(gameState),None)
+        #if reach the bottom of depths
+        if depth > self.depth:
+            return (self.evaluationFunction(gameState),None)
+        #find the next agent
+        if agentIndex == gameState.getNumAgents() - 1:
+            nextAgentIndex = 0;
+        else:
+            nextAgentIndex = agentIndex+1;
+        #get all successor game states
+        legal_actions = gameState.getLegalActions(agentIndex)
+        #if pacman, find the max successor
+        if agentIndex==0:
+            max_value, max_action = -1000000, None
+            for action in legal_actions:
+                successor_state = gameState.generateSuccessor(agentIndex,action)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth)
+                if value > max_value:
+                    max_value, max_action = value, action
+            return (max_value, max_action)
+        #if ghost, find the min successor
+        else:
+            min_value, min_action = 1000000, None
+            #increase depth by 1 if a pile is finished
+            if agentIndex == gameState.getNumAgents() - 1:
+                depth += 1
+            for action in legal_actions:
+                successor_state = gameState.generateSuccessor(agentIndex,action)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth)
+                if value < min_value:
+                    min_value, min_action = value, action
+            return (min_value, min_action)
+
+
+        
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
