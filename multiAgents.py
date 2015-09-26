@@ -268,19 +268,72 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
     def getAction(self, gameState):
         """
-          Returns the expectimax action using self.depth and self.evaluationFunction
+          Returns the minimax action from the current gameState using self.depth
+          and self.evaluationFunction.
 
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
+          Here are some method calls that might be useful when implementing minimax.
+
+          gameState.getLegalActions(agentIndex):
+            Returns a list of legal actions for an agent
+            agentIndex=0 means Pacman, ghosts are >= 1
+
+          gameState.generateSuccessor(agentIndex, action):
+            Returns the successor game state after an agent takes an action
+
+          gameState.getNumAgents():
+            Returns the total number of agents in the game
+
+          gameState.isWin():
+            Returns whether or not the game state is a winning state
+
+          gameState.isLose():
+            Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        (max_value, max_action) = self.evaluate(gameState,0,1);
+        return max_action
+
+    def evaluate(self,gameState,agentIndex,depth):
+        #if the game ends
+        if gameState.isLose() or gameState.isWin():
+            return (self.evaluationFunction(gameState),None)
+        #if reach the bottom of depths
+        if depth > self.depth:
+            return (self.evaluationFunction(gameState),None)
+        #find the next agent
+        if agentIndex == gameState.getNumAgents() - 1:
+            nextAgentIndex = 0;
+        else:
+            nextAgentIndex = agentIndex+1;
+        #get all successor game states
+        legal_actions = gameState.getLegalActions(agentIndex)
+        #if pacman, find the max successor
+        if agentIndex==0:
+            max_value, max_action = -1000000, None
+            for action in legal_actions:
+                successor_state = gameState.generateSuccessor(agentIndex,action)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth)
+                if value > max_value:
+                    max_value, max_action = value, action
+            return (max_value, max_action)
+        #if ghost, find the min successor
+        else:
+            total_value = 0
+            #increase depth by 1 if a pile is finished
+            if agentIndex == gameState.getNumAgents() - 1:
+                depth += 1
+            for action in legal_actions:
+                successor_state = gameState.generateSuccessor(agentIndex,action)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth)
+                total_value += value
+            expected_value = total_value/len(legal_actions)
+            return (expected_value, random.choice(legal_actions))
+
+
 
 def betterEvaluationFunction(currentGameState):
     """
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
-
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
