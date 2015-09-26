@@ -230,14 +230,17 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         #if pacman, find the max successor
         if agentIndex==0:
             max_value, max_action = -sys.maxint-1, None
+            new_alpha = [alpha[0]]
             for action in legal_actions:
                 successor_state = gameState.generateSuccessor(agentIndex,action)
-                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth,alpha,beta)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth,new_alpha,beta)
                 if value > max_value:
                     max_value, max_action = value, action
                 if max_value > beta[0]:
-                    return (max_value, action)
-                alpha[0] = max(alpha[0], max_value)
+                    print "max value is " + str(max_value)
+                    print "beta for " + str(max_action) + " " + str(beta[0])
+                    return (max_value, max_action)
+                new_alpha[0] = max(new_alpha[0], max_value)
             return (max_value, max_action)
         #if ghost, find the min successor
         else:
@@ -245,14 +248,16 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             #increase depth by 1 if a pile is finished
             if agentIndex == gameState.getNumAgents() - 1:
                 depth += 1
+            new_beta = [beta[0]]
             for action in legal_actions:
                 successor_state = gameState.generateSuccessor(agentIndex,action)
-                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth,alpha,beta)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth,alpha,new_beta)
                 if value < min_value:
                     min_value, min_action = value, action
                 if min_value < alpha[0]:
-                    return (min_value, action)
-                beta[0] = min(beta[0], min_value)
+                    #print "alpha for " + str(min_action) + " " + str(alpha[0])
+                    return (min_value, min_action)
+                new_beta[0] = min(new_beta[0], min_value)
             return (min_value, min_action)
 
 
