@@ -13,7 +13,7 @@
 
 from util import manhattanDistance
 from game import Directions
-import random, util
+import random, util, sys
 
 from game import Agent
 
@@ -208,8 +208,53 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        alpha = [-sys.maxint-1]
+        beta = [sys.maxint]
+        (max_value, max_action) = self.evaluate(gameState,0,1,alpha,beta);
+        return max_action
+       
+    def evaluate(self,gameState,agentIndex,depth,alpha,beta):
+        #if the game ends
+        if gameState.isLose() or gameState.isWin():
+            return (self.evaluationFunction(gameState),None)
+        #if reach the bottom of depths
+        if depth > self.depth:
+            return (self.evaluationFunction(gameState),None)
+        #find the next agent
+        if agentIndex == gameState.getNumAgents() - 1:
+            nextAgentIndex = 0;
+        else:
+            nextAgentIndex = agentIndex+1;
+        #get all successor game states
+        legal_actions = gameState.getLegalActions(agentIndex)
+        #if pacman, find the max successor
+        if agentIndex==0:
+            max_value, max_action = -sys.maxint-1, None
+            for action in legal_actions:
+                successor_state = gameState.generateSuccessor(agentIndex,action)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth,alpha,beta)
+                if value > max_value:
+                    max_value, max_action = value, action
+                if max_value > beta[0]:
+                    return (max_value, action)
+                alpha[0] = max(alpha[0], max_value)
+            return (max_value, max_action)
+        #if ghost, find the min successor
+        else:
+            min_value, min_action = sys.maxint, None
+            #increase depth by 1 if a pile is finished
+            if agentIndex == gameState.getNumAgents() - 1:
+                depth += 1
+            for action in legal_actions:
+                successor_state = gameState.generateSuccessor(agentIndex,action)
+                (value,a) = self.evaluate(successor_state,nextAgentIndex,depth,alpha,beta)
+                if value < min_value:
+                    min_value, min_action = value, action
+                if min_value < alpha[0]:
+                    return (min_value, action)
+                beta[0] = min(beta[0], min_value)
+            return (min_value, min_action)
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
