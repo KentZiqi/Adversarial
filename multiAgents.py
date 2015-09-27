@@ -329,7 +329,10 @@ def betterEvaluationFunction(currentGameState):
     """
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION: The less food items and capsules left, the more points.
+		   The closer you are to the nearest food item, the more points.
+		   If you are less than 3 squares away from a ghost, the less points (note
+		   the penalty is heavier if you are 2, 1, or 0 squares away from the ghost).
     """
     score = currentGameState.getScore();
     newPos = currentGameState.getPacmanPosition()
