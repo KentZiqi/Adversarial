@@ -331,15 +331,18 @@ def betterEvaluationFunction(currentGameState):
       evaluation function (question 5).
       DESCRIPTION: <write something here so we know what you did>
     """
-    score = 0;
+    score = currentGameState.getScore();
     newPos = currentGameState.getPacmanPosition()
     food = currentGameState.getFood()
     foodNum = currentGameState.getNumFood()
     #want to reduce the distance to the closest food
-    score = score - 10*nearestFoodDistance(food,newPos)
+    score = score + 20/nearestFoodDistance(food,newPos)
     #want to reduce the number of food(to prevent pacman from staying close to food but not eat it)
     score = score - 1000*foodNum;
     newGhostStates = currentGameState.getGhostStates()
+    #reduce the number of capsules
+    capsule = len(currentGameState.getCapsules())
+    score = score - 3000*capsule
     for ghostState in newGhostStates:
         ghostPosition = ghostState.getPosition()
         distance = manhattanDistance(newPos,ghostPosition)
@@ -347,8 +350,7 @@ def betterEvaluationFunction(currentGameState):
         if distance < 3:
             score = score - 5000;
             score = score+distance*50
-            return score
-    return currentGameState.getScore()
+    return score
 
 def nearestFoodDistance(food,position):
     height, width = food.height, food.width
